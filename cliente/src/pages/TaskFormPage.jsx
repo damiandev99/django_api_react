@@ -1,22 +1,52 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { createTask } from "../api/task.api";
+import { createTask, deleteTask, updateTask, getTask } from "../api/task.api";
 //! Use paramr es para traer o ver los datos de la url y de esta manera poder ocultar el boton de delete y ver si viene el id de la tarea y mostrar el boton, caso contrario no
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 export function TaskFormPage() {
 
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, formState: { errors }, setValue } = useForm();
     const navigate = useNavigate()
     const params = useParams()
-    console.log(params);
-    
 
-    const  onSubmit = handleSubmit(async data => {        
-        await createTask(data);
+
+
+    const onSubmit = handleSubmit(async data => {
+        if (params.id) {
+            await updateTask(params.id, data)
+            toast.success('Tarea actualizada', {
+                position: 'bottom-right',
+                style: {
+                    background: '#202020',
+                    color: '#fff'
+                }
+            })
+        } else {
+            await createTask(data)
+            toast.success('Tarea creada', {
+                position: 'bottom-right',
+                style: {
+                    background: '#202020',
+                    color: '#fff'
+                }
+            })
+        }
         navigate("/tasks")
-        
-    });
 
+    });
+    useEffect(() => {
+        async function loadTask() {
+            if (params.id) {
+                const { data: { title, description } } = await getTask(params.id)
+                setValue('title', title)
+                setValue('description', description)
+
+            }
+        }
+        loadTask()
+    }, [])
     return (
         <div>
             <form onSubmit={onSubmit}>
@@ -32,7 +62,24 @@ export function TaskFormPage() {
                 {errors.description && <span>Description is required</span>}
                 <button type="Sumbmit"> Save </button>
             </form>
-            <button>Delete</button>
+            {
+                params.id && <button onClick={async () => {
+                    const accepted = window.confirm('Are you sure?')
+                    if (accepted) {
+                        await deleteTask(params.id)
+                        toast.success('Tarea eliminada', {
+                            position: 'bottom-right',
+                            style: {
+                                background: '#202020',
+                                color: '#fff'
+                            }
+                        })
+                        navigate("/tasks")
+                    }
+                }}>Delete</button>
+            }
+
+
 
         </div>
     )
