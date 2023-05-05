@@ -48,36 +48,41 @@ export function TaskFormPage() {
         loadTask()
     }, [])
     return (
-        <div>
+        <div className="max-w-xl mx-auto">
             <form onSubmit={onSubmit}>
-                <input type="text" placeholder="text"
+                <input type="text" placeholder="text" className="bg-zinc-700 p-3 rounded-lg block w-full mb-3"
                     {...register("title", { required: true })}
                 />
                 {/*! Manejador de errores */}
                 {errors.title && <span>Title is required</span>}
 
-                <textarea rows="3" placeholder="Description"
+                <textarea rows="3" placeholder="Description" className="bg-zinc-700 p-3 rounded-lg block w-full mb-3"
                     {...register("description", { required: true })}
                 ></textarea>
                 {errors.description && <span>Description is required</span>}
-                <button type="Sumbmit"> Save </button>
+                <button type="Sumbmit" className="bg-indigo-500 p-3 rounded-lg block w-full mt-3"> Save </button>
             </form>
             {
-                params.id && <button onClick={async () => {
-                    const accepted = window.confirm('Are you sure?')
-                    if (accepted) {
-                        await deleteTask(params.id)
-                        toast.success('Tarea eliminada', {
-                            position: 'bottom-right',
-                            style: {
-                                background: '#202020',
-                                color: '#fff'
-                            }
-                        })
-                        navigate("/tasks")
-                    }
-                }}>Delete</button>
-            }
+                params.id && (
+                    <div className="flex justify-end">
+                        <button
+                            className="bg-red-500 p-3 rounded-lg w-48 mt-3"
+                            onClick={async () => {
+                                const accepted = window.confirm('Are you sure?')
+                                if (accepted) {
+                                    await deleteTask(params.id)
+                                    toast.success('Tarea eliminada', {
+                                        position: 'bottom-right',
+                                        style: {
+                                            background: '#202020',
+                                            color: '#fff'
+                                        }
+                                    })
+                                    navigate("/tasks")
+                                }
+                            }}>Delete</button>
+                    </div>
+                )}
 
 
 
